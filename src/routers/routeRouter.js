@@ -1,5 +1,5 @@
 import express from "express";
-import {join,login} from "../controllers/userController";
+import {getJoin,postJoin,getLogin,postLogin} from "../controllers/userController";
 import {home,search} from "../controllers/videoController";
 
 
@@ -7,8 +7,8 @@ const routeRouter=express.Router();
 
 
 routeRouter.get("/",home);
-routeRouter.get("/join",join);
-routeRouter.get("/login",login);
+routeRouter.route("/join").get(getJoin).post(postJoin);
+routeRouter.route("/login").get(getLogin).post(postLogin);
 routeRouter.get("/search",search);
 
 export default routeRouter;
