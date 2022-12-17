@@ -1,5 +1,6 @@
-import app from "./server";
+import "dotenv/config";
 import "./db";
+import app from "./server";
 import Video from "./models/Video";
 import User from "./models/User";
 
