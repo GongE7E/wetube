@@ -109,6 +109,7 @@ let user= await User.findOne({email: emailObj.email});
 if(!user){
     const user=await User.create({
         name:userData.name,
+        avatarUrl:userData.avatar_url,
         username:userData.login,
         email:emailObj.email,
         password:"",
@@ -127,5 +128,9 @@ return res.redirect("/login");
 
 export const see=(req,res)=>res.send("See User");
 export const editUser=(req,res)=>res.send("Edit");
-export const remove=(req,res)=>res.send("Remove");
-export const logout=(req,res)=>res.send("Logout");
+
+
+export const logout=(req,res)=>{
+    req.session.destroy();
+    return res.redirect("/");
+};
