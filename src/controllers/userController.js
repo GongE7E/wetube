@@ -2,6 +2,7 @@ import User from "../models/User";
 import bcrypt from "bcrypt";
 import fetch from "node-fetch";
 import e from "express";
+import { compileClientWithDependenciesTracked } from "pug";
 
 export const getJoin=(req,res)=>res.render("Join",{pageTitle:"Join"});
 
@@ -59,9 +60,9 @@ export const postLogin=async(req,res)=>{
 };
 
 export const startGithubLogin=(req,res)=>{
-    const baseUrl="http://github.com/login/oauth/authorize";
+    const baseUrl="https://kauth.kakao.com/oauth/authorize";
     const config={
-    client_id:process.env.GH_CLIENT,
+    client_id:process.env.KO_CLIENT,
     allow_signup:false,
     scope: "read:user user:email",
     };
@@ -134,3 +135,72 @@ export const logout=(req,res)=>{
     req.session.destroy();
     return res.redirect("/");
 };
+
+export const startKakaoLogin = (req, res) => {
+    const baseUrl = "https://kauth.kakao.com/oauth/authorize";
+    console.log(req.params);
+    const config = {
+    client_id: process.env.KO_CLIENT,
+    redirect_uri: "http://localhost:4000/users/kakao/finish",
+    response_type: "code",
+    };
+    const params = new URLSearchParams(config).toString();
+    const finalUrl = `${baseUrl}?${params}`;
+    return res.redirect(finalUrl);
+};
+
+export const finishKakaoLogin = async (req, res) => {
+    const baseUrl = "https://kauth.kakao.com/oauth/token";
+    const config = {
+    grant_type: "authorization_code",
+    client_id: process.env.KO_CLIENT,
+    redirect_uri: "http://localhost:4000/users/kakao/finish",
+    code: req.query.code, 
+    };
+    const params = new URLSearchParams(config).toString();
+    const finalUrl = `${baseUrl}?${params}`;
+    const tokenRequest = await (
+    await fetch(finalUrl, {
+        method: "POST",
+        headers:{
+            Accept:"application/json",
+        }
+    })
+    ).json();
+    if("access_token" in tokenRequest){
+        const {access_token}=tokenRequest;
+        const apiUrl="https://kapi.kakao.com/v2/user/me";
+        const userData=await(await fetch(`${apiUrl}`,{
+            headers:{
+                Authorization: `Bearer ${access_token}`,
+            }
+        })
+        ).json();
+        const kakaoAccount=userData.kakao_account;
+        const kakaoProfile=kakaoAccount.profile;
+
+        if(kakaoAccount.is_email_valid===false || kakaoAccount.is_email_verified===false){
+            return res.redirect("/login");
+        };
+        let user = await User.findOne({ email: kakaoAccount.email });
+        if(!user){
+            user=await User.create({
+                name:kakaoProfile.nickname,
+                nickname:kakaoProfile.nickname,
+                email:kakaoAccount.email,
+                socialOnly:true,
+                password:"",
+
+            });
+        }
+            req.session.loggedIn=true;
+            req.session.user=user;
+            return res.redirect("/");
+        }
+else{
+    res.redirect("/login");
+}
+};
+
+
+
