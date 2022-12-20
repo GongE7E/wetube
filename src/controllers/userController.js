@@ -127,9 +127,17 @@ return res.redirect("/login");
 
 
 
-export const see=(req,res)=>res.send("See User");
-export const editUser=(req,res)=>res.send("Edit");
 
+export const see=(req,res)=>res.send("See User");
+
+
+
+export const getEdit=(req,res)=>{
+    return res.render("edit-profile",{pageTitle:"Edit Profile"});
+}
+export const postEdit=(req,res)=>{
+    return res.redirect("/");
+}
 
 export const logout=(req,res)=>{
     req.session.destroy();
