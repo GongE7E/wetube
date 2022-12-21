@@ -28,6 +28,8 @@ app.use(session({
     store:MongoStore.create({mongoUrl: process.env.DB_URL}),
 })
 );
+
+
 app.use(localsMiddleware);
 app.use("/",routeRouter);
 app.use("/users",userRouter);
