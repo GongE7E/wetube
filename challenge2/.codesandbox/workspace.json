@@ -1,0 +1,88 @@
+{
+  "preview": [
+    {
+      "views": [
+        {
+          "id": "codesandbox.browser"
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 39903
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 39323
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 40483
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 40741
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 44337
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 45775
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 36895
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 46641
+          },
+          "closeable": true
+        },
+        {
+          "id": "codesandbox.browser",
+          "options": {
+            "port": 42369
+          },
+          "closeable": true
+        }
+      ]
+    },
+    {
+      "open": true,
+      "views": [
+        {
+          "id": "codesandbox.terminal"
+        },
+        {
+          "id": "codesandbox.console"
+        },
+        {
+          "id": "codesandbox.problems"
+        }
+      ]
+    }
+  ]
+}
