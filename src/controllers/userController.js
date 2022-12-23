@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import fetch from "node-fetch";
 import e from "express";
 import { compileClientWithDependenciesTracked } from "pug";
+import session from "express-session";
 
 export const getJoin=(req,res)=>res.render("Join",{pageTitle:"Join"});
 
@@ -60,9 +61,9 @@ export const postLogin=async(req,res)=>{
 };
 
 export const startGithubLogin=(req,res)=>{
-    const baseUrl="https://kauth.kakao.com/oauth/authorize";
+    const baseUrl="https://github.com/login/oauth/authorize";
     const config={
-    client_id:process.env.KO_CLIENT,
+    client_id:process.env.GH_CLIENT,
     allow_signup:false,
     scope: "read:user user:email",
     };
@@ -79,52 +80,59 @@ export const finishGithubLogin=async(req,res)=>{
     };
     const params=new URLSearchParams(config).toString();
     const finalUrl=`${baseUrl}?${params}`;
-    const tokenRequest=await(await fetch(finalUrl,{
-        method:"POST",
-            headers:{
-            Accept:"application/json",
-        }
-    })).json();
-
-if("access_token"in tokenRequest){
-    const {access_token}=tokenRequest;
-    const apiUrl="https://api.github.com";
-    const userData=await(await fetch(`${apiUrl}/user`,{
+    const tokenRequest =await (await
+        fetch(finalUrl,{
+        method:"post",
         headers:{
-            Authorization:`token ${access_token}`
-        }
-    })).json();
-    const emailData= await(
-        await fetch(`${apiUrl}/user/emails`,{
+            Accept:"application/json",
+        },
+    })
+    ).json();
+    if("access_token"in tokenRequest){
+        const {access_token}=tokenRequest;
+        const apiUrl="https://api.github.com";
+        const userData=await(await fetch(`${apiUrl}/user`,{
             headers:{
                 Authorization:`token ${access_token}`
-},
-})
+            },
+        })
     ).json();
-    const emailObj=emailData.find(
-    (email)=>email.primary===true && email.verified===true);
+    //console.log(userData);
+    const emailData=await(await fetch(`${apiUrl}/user/emails`,{
+        headers:{
+            Authorization:`token ${access_token}`
+        },
+    })
+).json();
+//   console.log(emailData);
+const emailObj=emailData.find(
+(email)=>email.primary===true&& email.verified ===true
+);
 if(!emailObj){
     return res.redirect("/login");
 }
-let user= await User.findOne({email: emailObj.email});
-if(!user){
-    const user=await User.create({
-        name:userData.name,
-        avatarUrl:userData.avatar_url,
-        username:userData.login,
-        email:emailObj.email,
-        password:"",
-        socialOnly:true,
-        location:userData.location,});
-    }
+const existingUser= await User.findOne({email:emailObj.email});
+if(existingUser){
     req.session.loggedIn=true;
-    req.session.user= user;
+    req.session.user=existingUser;
     return res.redirect("/");
-}else{
-return res.redirect("/login");
-}   
+}
+    else{
+        const user=await User.create({
+            name:userData.name?userData.name:"Unknown",
+            username:userData.login,
+            email:emailObj.email,
+            password:"",
+            socialOnly:true,
+            location:userData.location,
+        });
+            req.session.loggedIn=true;
+            req.session.user=existingUser;
+            return res.redirect("/");
+        }
+    
+}
 };
-
 
 
 
@@ -141,6 +149,13 @@ export const postEdit=async(req,res)=>{
     },
     body:{name,email,username,location}
 } =req;
+    const loggedInUsername=res.locals.loggedInUser.username;
+    const exists=await User.exists({$or:[{username},{email}]});
+    if(exists&&(loggedInUsername!==username)){
+        return res.status(400).render("edit-profile",{
+            pageTitle:"Edit Profile",
+            errorMessage:"This username/email is already taken."}); 
+    }
     const updatedUser=await User.findByIdAndUpdate(_id,{
         name,
         username,
@@ -150,6 +165,7 @@ export const postEdit=async(req,res)=>{
     req.session.user=updatedUser;
         return res.redirect("/users/edit");
     };
+
 
 export const logout=(req,res)=>{
     req.session.destroy();
@@ -222,5 +238,12 @@ else{
 }
 };
 
-
-
+export const getChangePassword=(req,res)=>{
+    if(req.session.user.socialOnly===true){
+        return res.redirect("/");
+    }
+    return res.render("users/change-password",{pageTitle:"Change Password"});
+}
+export const postChangePassword=(req,res)=>{
+    return res.redirect("/");
+};
