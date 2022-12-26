@@ -1,0 +1,26 @@
+
+doctype html 
+html(lang="en")
+    include paritals/head.pug
+    body
+        header  
+            include paritals/header.pug
+            nav
+                ul
+                    li
+                        a(href="/join") Join
+                    li
+                        a(href="/login") Login
+                    li
+                        a(href="/users") Users
+                    li
+                        a(href="/users/edit-profile") Edit-Profile 
+                    li
+                        a(href="/trending") Trending
+                    li 
+                        a(href="/new") newStories
+
+    main
+        block content
+        include paritals/footer.pug
+
