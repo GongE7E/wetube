@@ -145,10 +145,12 @@ export const getEdit=(req,res)=>{
 }
 export const postEdit=async(req,res)=>{
     const {session: 
-        {user:{_id}
+        {user:{_id,avatarUrl}
     },
-    body:{name,email,username,location}
+    body:{name,email,username,location,},
+    file,
 } =req;
+    //console.log(file);
     const loggedInUsername=res.locals.loggedInUser.username;
     const exists=await User.exists({$or:[{username},{email}]});
     if(exists&&(loggedInUsername!==username)){
@@ -157,6 +159,7 @@ export const postEdit=async(req,res)=>{
             errorMessage:"This username/email is already taken."}); 
     }
     const updatedUser=await User.findByIdAndUpdate(_id,{
+        avatarUrl:file? file.path: avatarUrl,
         name,
         username,
         email,
