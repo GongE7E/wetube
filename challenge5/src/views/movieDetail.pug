@@ -1,0 +1,8 @@
+extends index.pug
+
+block content
+  h2=movie.title
+  p=movie.info
+  ul
+    each genre in movie.genres
+      li=genre

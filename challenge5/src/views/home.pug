@@ -1,0 +1,11 @@
+extends index.pug
+include ../mixins/movie
+
+block content
+    h1=pageTitle
+    form(action="/filter", method="get")
+        input(type="number", name="year" , placeholder="Filter by year")
+        input(type="number", name="rating", placeholder="Filter by rating")
+        input(type="submit", value="Search")
+    each movie in movies
+         +movie(movie)
