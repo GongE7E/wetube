@@ -17,14 +17,10 @@ export const movieDetail = (req, res) => {
 export const getaddMovie = (req, res) => {
   return res.render("addMovie", { pageTitle: "Add Movie" });
 };
+
 export const postaddMovie = (req, res) => {
-  const { title, synopsis, genres } = req.body;
-  const addMovie = [{ title, synopsis, genres }];
-  const newMovie = {
-    title,
-    synopsis,
-    genres: genres.split(",")
-  };
-  addMovie.push(newMovie);
+  const {title,synopsis,genres} = req;
+  addMovie({ title, synopsis, genres: genres.split(",") });
   return res.redirect("/");
+
 };
