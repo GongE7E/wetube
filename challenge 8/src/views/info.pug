@@ -1,0 +1,15 @@
+extends base
+
+block content
+      h3 #{movie.title}
+      h4 #{movie.summary}
+      h5 genres: #{movie.genres}
+      ul
+        li
+          h4=movie.year
+        li
+          h4 #{movie.rating} /10
+
+      a(href=`${movie.id}/edit`) Edit movie &#9989;
+      br
+      a(href=`${movie.id}/delete`) Delete movie &#10062;

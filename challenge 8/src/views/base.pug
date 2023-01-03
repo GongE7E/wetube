@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+html(lang="en")
+  include partials/head.pug
+    title #{pageTitle} | Movie
+  body
+    header
+        h1=pageTitle
+        
+    nav
+        ul
+            li
+                a(href="/upload") Upload
+            li
+                a(href="/search") Search
+    
+
+  main
+    block content
+    include partials/footer.pug
